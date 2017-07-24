@@ -12,6 +12,7 @@ namespace RoboHobo
     class RoboHobo
     {
         DiscordClient discord;
+        CommandService commands;
 
         public RoboHobo()
         {
@@ -23,22 +24,27 @@ namespace RoboHobo
 
             discord.UsingCommands(x =>
             {
-                x.PrefixChar = '/';
+                x.PrefixChar = '!';
                 x.AllowMentionPrefix = true;
             });
 
-            var commands = discord.GetService<CommandService>();
+            commands = discord.GetService<CommandService>();
 
-            commands.CreateCommand("Hello")
-                .Do(async (e) =>
-                {
-                    await e.Channel.SendMessage("Hi!");
-                });
+            registerFbi();
 
             discord.ExecuteAndWait(async () =>
             {
                 await discord.Connect("MzM4OTM0MDA3ODAwNTI4ODk5.DFcvQg.lDurq8F8mcRyfEOxZk-rDCkjZis", TokenType.Bot);
             });
+        }
+
+        private void registerFbi()
+        {
+            commands.CreateCommand("fbi")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendFile("images/fbi1.gif");
+                });
         }
 
         private void Log(object sender, LogMessageEventArgs e)
