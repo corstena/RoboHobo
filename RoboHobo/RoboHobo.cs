@@ -13,6 +13,7 @@ namespace RoboHobo
     {
         DiscordClient discord;
         CommandService commands;
+        Random r;
 
         public RoboHobo()
         {
@@ -29,11 +30,18 @@ namespace RoboHobo
             });
 
             commands = discord.GetService<CommandService>();
+            r = new Random();
 
-            registerHelp();
+            registerCommands();
             registerFbi();
             registerLenny();
             registerWhenIsPax();
+            registerSadReaction();
+            registerHappyReaction();
+            registerGoodJobReaction();
+            registerToddReaction();
+            registerKantaiReaction();
+            registerNopeDog();
 
             discord.ExecuteAndWait(async () =>
             {
@@ -41,12 +49,18 @@ namespace RoboHobo
             });
         }
 
-        private void registerHelp()
+        private void registerCommands()
         {
             commands.CreateCommand("commands")
                 .Do(async (e) =>
                 {
-                   await e.Channel.SendMessage("The current list of commands are: \"~fbi\", \"~lenny\", \"~whenispax\"");
+                    String[] commandList = new String[] { "fbi", "lenny", "whenispax", "sad", "nopedog", "happy", "goodjob", "todd", "kancolle" };
+                    String commands = "";
+                    foreach(String command in commandList)
+                    {
+                        commands = commands + "~" + command + "\n";
+                    }
+                   await e.Channel.SendMessage("The current list of commands are: \n" + commands);
                 });
         }
 
@@ -85,6 +99,66 @@ namespace RoboHobo
                     }
 
                     await e.Channel.SendMessage(message);
+                });
+        }
+
+        private void registerSadReaction()
+        {
+            commands.CreateCommand("sad")
+                .Do(async (e) =>
+                {
+                    String[] sadReactions = new String[] { "sad1.jpg", "sad2.gif", "sad3.png", "sad4.jpg", "sad5.jpg", "sad6.gif", "sad7.gif", "sad8.gif", "sad9.jpg", "sad10.gif"};
+                    await e.Channel.SendFile("images/sad/" + sadReactions[r.Next(sadReactions.Length)]);
+                });
+        }
+
+        private void registerNopeDog()
+        {
+            commands.CreateCommand("nopedog")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendFile("images/nopedog.gif");
+                });
+        }
+
+        private void registerHappyReaction()
+        {
+            commands.CreateCommand("happy")
+                .Do(async (e) =>
+                {
+                    String[] happyReactions = new String[] { "happy1.jpg", "happy2.jpg", "happy3.jpg", "happy4.png", "happy5.gif", "happy6.png", "happy7.jpg", "happy8.gif", "happy9.jpg", "happy10.jpg" };
+                    await e.Channel.SendFile("images/happy/" + happyReactions[r.Next(happyReactions.Length)]);
+                });
+        }
+
+        private void registerGoodJobReaction()
+        {
+            commands.CreateCommand("goodjob")
+                .Do(async (e) =>
+                {
+                    String[] goodjobReactions = new String[] { "goodjob1.gif", "goodjob2.jpg", "goodjob3.gif", "goodjob4.gif", "goodjob5.png", "goodjob6.jpg", "goodjob7.gif", "goodjob8.jpg", "goodjob9.gif", "goodjob10.png", "goodjob11.gif" };
+                    await e.Channel.SendFile("images/goodjob/goodjob1.gif");
+                    //await e.Channel.SendFile("images/goodjob/" + goodjobReactions[r.Next(goodjobReactions.Length)]);
+                });
+        }
+
+        private void registerToddReaction()
+        {
+            commands.CreateCommand("todd")
+                .Do(async (e) =>
+                {
+                    String[] toddReactions = new String[] { "todd1.jpg", "todd2.jpg", "todd3.jpg", "todd4.jpg", "todd5.jpg", "todd6.png", "todd7.png" };
+                    await e.Channel.SendFile("images/todd/" + toddReactions[r.Next(toddReactions.Length)]);
+                });
+        }
+
+        private void registerKantaiReaction()
+        {
+            commands.CreateCommand("kancolle")
+                .Do(async (e) =>
+                {
+                    String[] kantaiReactions = new String[] { "kantai1.gif", "kantai2.gif", "kantai3.gif", "kantai4.gif", "kantai5.gif", "kantai6.gif", "kantai7.gif", "kantai8.gif", "kantai9.gif", "kantai10.gif" };
+                    await e.Channel.SendFile("images/kancolle/" + kantaiReactions[r.Next(kantaiReactions.Length)]);
                 });
         }
 
