@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using GiphyDotNet;
-
+using RestSharp;
 using System;
 using System.Configuration;
 using System.Collections.Generic;
@@ -41,6 +41,7 @@ namespace RoboHobo
             registerWhenIsPax();
             registerNopeDog();
             registerReaction();
+            registerRandomGif();
 
             discord.ExecuteAndWait(async () =>
             {
@@ -106,7 +107,7 @@ namespace RoboHobo
             commands.CreateCommand("react")
                 .Alias(new String[] { "r", "reaction" })
                 .Description("Send a reaction image/gif")
-                .Parameter("reactionType", ParameterType.Required)
+                .Parameter("reactionType", Discord.Commands.ParameterType.Required)
                 .Do(async (e) =>
                 {
                     String rType = e.GetArg("reactionType").ToString().ToLower();
@@ -151,9 +152,16 @@ namespace RoboHobo
                 });
         }
 
-        private void registerSearchGiphy()
+        private void registerRandomGif()
         {
-            
+            commands.CreateCommand("randomgif")
+                .Alias(new String[] { "random", "rgif" })
+                .Description("Send a random GIPHY gif to the chat!")
+                .Do(async (e) =>
+                {
+                    GiphyApi gifSearch = new GiphyApi(ConfigurationManager.AppSettings["giphyKey"]);
+                    await e.Channel.SendMessage(gifSearch.GetRandomGif().url); 
+                });
         }
 
         private void Log(object sender, LogMessageEventArgs e)
