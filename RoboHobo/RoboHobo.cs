@@ -39,9 +39,10 @@ namespace RoboHobo
             registerFbi();
             registerLenny();
             registerWhenIsPax();
-            registerNopeDog();
             registerReaction();
             registerRandomGif();
+            registerAnimeGif();
+            registerCommandAlias();
 
             discord.ExecuteAndWait(async () =>
             {
@@ -54,7 +55,7 @@ namespace RoboHobo
             commands.CreateCommand("commands")
                 .Do(async (e) =>
                 {
-                    String[] commandList = new String[] { "fbi", "lenny", "whenispax", "react", "nopedog" };
+                    String[] commandList = new String[] { "fbi", "lenny", "whenispax", "react", "randomgif", "alias", "animegif"};
                     String commands = "";
                     foreach(String command in commandList)
                     {
@@ -87,12 +88,13 @@ namespace RoboHobo
             commands.CreateCommand("whenispax")
                 .Do(async (e) =>
                 {
-                    DateTime paxStart = new DateTime(2017, 9, 2, 8 ,0 , 0);
+                    DateTime paxStart = new DateTime(2017, 9, 2, 8 ,0 ,0);
                     DateTime currentTime = DateTime.Now;
                     var message = "";
                     if(paxStart.CompareTo(currentTime) > 0)
                     {
-                        message = currentTime.Day + " days, " + currentTime.Hour + " hours, " + currentTime.Minute + " minutes, and " + currentTime.Second + " seconds until PAX West 2017!";
+                        TimeSpan remainingTime = paxStart.Subtract(currentTime);
+                        message = remainingTime.Days + " days, " + remainingTime.Hours + " hours, " + remainingTime.Minutes + " minutes, and " + remainingTime.Seconds + " seconds until PAX West 2017!";
                     } else
                     {
                         message = "PAX West 2017 is over!";
@@ -122,7 +124,7 @@ namespace RoboHobo
                             break;
                         case "goodjob":
                             String[] goodjobReactions = new String[] { "goodjob1.gif", "goodjob2.jpg", "goodjob3.gif", "goodjob4.gif", "goodjob5.png", "goodjob6.jpg", "goodjob7.gif", "goodjob8.jpg", "goodjob9.gif", "goodjob10.png", "goodjob11.gif" };
-                            await e.Channel.SendFile("images/goodjob/goodjob1.gif");
+                            await e.Channel.SendFile("images/goodjob/" + goodjobReactions[r.Next(goodjobReactions.Length)]);
                             break;
                         case "happy":
                             String[] happyReactions = new String[] { "happy1.jpg", "happy2.jpg", "happy3.jpg", "happy4.png", "happy5.gif", "happy6.png", "happy7.jpg", "happy8.gif", "happy9.jpg", "happy10.jpg" };
@@ -143,15 +145,6 @@ namespace RoboHobo
                 });
         }
 
-        private void registerNopeDog()
-        {
-            commands.CreateCommand("nopedog")
-                .Do(async (e) =>
-                {
-                    await e.Channel.SendFile("images/nopedog.gif");
-                });
-        }
-
         private void registerRandomGif()
         {
             commands.CreateCommand("randomgif")
@@ -160,8 +153,32 @@ namespace RoboHobo
                 .Do(async (e) =>
                 {
                     GiphyApi gifSearch = new GiphyApi(ConfigurationManager.AppSettings["giphyKey"]);
-                    await e.Channel.SendMessage(gifSearch.GetRandomGif().url); 
+                    await e.Channel.SendMessage(gifSearch.GetRandomGif()); 
                 });
+        }
+
+        private void registerAnimeGif()
+        {
+            commands.CreateCommand("animegif")
+                .Alias(new String[] { "agif", "anime" })
+                .Description("Send an anime related searh result gif")
+                .Parameter("searchQuery", Discord.Commands.ParameterType.Required)
+                .Do(async (e) =>
+                 {
+                     var filteredQuery = e.GetArg("searchQuery").ToString().Trim().ToLower().Replace("_", "+");
+                     Console.WriteLine(filteredQuery);
+                     GiphyApi animeGifSearch = new GiphyApi(ConfigurationManager.AppSettings["giphyKey"]);
+                     await e.Channel.SendMessage(animeGifSearch.GetAnimeGif(filteredQuery));
+                 });
+        }
+
+        private void registerCommandAlias()
+        {
+            commands.CreateCommand("alias")
+                .Do(async (e) =>
+                 {
+                     await e.Channel.SendMessage("The current commands have the following aliases (i.e. you can call the command with the alias):\n ~react: r, reaction\n ~randomgif: random, rgif");
+                 });
         }
 
         private void Log(object sender, LogMessageEventArgs e)
